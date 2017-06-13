@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textSize="24dp"
+        android:id="@+id/Totaltimer"
+        android:layout_centerHorizontal="true"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DistanceCovered :"
+        android:textSize="24dp"
+        android:padding="2dp"
+        android:layout_below="@+id/Totaltimer"
+        android:layout_marginTop="20dp"
+        android:id="@+id/distanceLabel"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0km"
+        android:padding="2dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="24dp"
+        android:gravity="right"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/distanceLabel"
+        android:layout_below="@+id/Totaltimer"
+        android:layout_marginTop="20dp"
+        android:id="@+id/distance_km"
+        android:layout_centerHorizontal="true"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Average Pace :"
+        android:textSize="24dp"
+        android:padding="2dp"
+        android:layout_below="@+id/distanceLabel"
+        android:layout_marginTop="20dp"
+        android:id="@+id/avgPaceLabel"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0.0Km/hr"
+        android:padding="2dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="24dp"
+        android:gravity="right"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/avgPaceLabel"
+        android:layout_below="@+id/distanceLabel"
+        android:layout_marginTop="20dp"
+        android:id="@+id/avgPace"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Workout Timer :"
+        android:textSize="24dp"
+        android:padding="2dp"
+        android:layout_below="@+id/avgPaceLabel"
+        android:layout_marginTop="20dp"
+        android:id="@+id/workoutTimerLabel"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:gravity="right"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dp"
+        android:textSize="24dp"
+        android:padding="2dp"
+        android:layout_toRightOf="@+id/workoutTimerLabel"
+        android:layout_below="@+id/avgPaceLabel"
+        android:layout_marginTop="20dp"
+        android:id="@+id/workoutTimer"
+        android:layout_centerHorizontal="true"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Activity"
+        android:padding="5dp"
+        android:id="@+id/userActivity"
+        android:layout_below="@+id/workoutTimerLabel"
+        android:layout_centerHorizontal="true"
+        android:textSize="24dp"/>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="2"
+    android:layout_alignParentBottom="true"
+    >
+    <Button android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:id="@+id/stopBtn"
+        android:text="Stop"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"></Button>
+    <Button android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:id="@+id/resumeBtn"
+        android:text="Pause"
+        android:layout_toRightOf="@+id/stopBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"></Button>
+</LinearLayout>
+</RelativeLayout>

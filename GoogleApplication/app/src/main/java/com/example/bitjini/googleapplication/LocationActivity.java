@@ -2,6 +2,7 @@ package com.example.bitjini.googleapplication;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
@@ -30,24 +31,41 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationActivity extends FragmentActivity implements LocationListener, GoogleMap.OnMyLocationChangeListener, OnMapReadyCallback {
+public class LocationActivity extends FragmentActivity implements   OnMapReadyCallback {
 
-    GoogleMap googleMap;
-    private boolean drawTrack = true;
-    private Polyline route = null;
-    private PolylineOptions routeOpts = null;
-    private ArrayList<LatLng> points; //added
+    ArrayList<LatLng> arrLocation=new ArrayList<>();
+    ArrayList<LatLng> arrPausedLocation=new ArrayList<>();
+
+    Location StartLocation,DestinationLocation;
     Polyline line; //added
+    TextView tvDistance,tvAvgSpeed;
+    Intent intent;
+    double speed=0.0;
+    double distanceCovered=0.0;
+    double lat_new,lon_new ,lat_curr ,lon_curr;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dist_time_layout);
         // Getting Google Play availability status
+        intiViews();
+         intent=getIntent();
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
-        points = new ArrayList<LatLng>(); //added
+
+        // Add a thin red line from current location to New Location.
+        Bundle b = getIntent().getExtras();
+         lat_new = b.getDouble("lat_new");
+         lon_new = b.getDouble("lon_new");
+         lat_curr = b.getDouble("lat_curr");
+         lon_curr= b.getDouble("lon_curr");
+        arrLocation=b.getParcelableArrayList("arrayOfLocation");
+        arrPausedLocation=b.getParcelableArrayList("arrPausedLocation");
+        distanceCovered=b.getDouble("distanceCovered");
+        speed=b.getDouble("speed");
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
 
@@ -57,149 +75,43 @@ public class LocationActivity extends FragmentActivity implements LocationListen
 
         } else { // Google Play Services are available
 
-            // Getting reference to the SupportMapFragment of activity_main.xml
-//            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
             // Getting GoogleMap object from the fragment
             SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
 
             // Getting Map for the SupportMapFragment
             fm.getMapAsync(this);
 
-            // Enabling MyLocation Layer of Google Map
-//            googleMap.setMyLocationEnabled(true);
 
-//            // Getting LocationManager object from System Service LOCATION_SERVICE
-//            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-//
-//            // Creating a criteria object to retrieve provider
-//            Criteria criteria = new Criteria();
-//
-//            // Getting the name of the best provider
-//            String provider = locationManager.getBestProvider(criteria, true);
-//
-//            // Getting Current Location
-//            Location location = locationManager.getLastKnownLocation(provider);
-//
-//            if (location != null) {
-//                onLocationChanged(location);
-//                startTracking();
-//                System.out.println("Latitude:" + location.getLatitude());
-//                System.out.println("Longitude:" + location.getLongitude());
-//
-//            }
-//            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                // TODO: Consider calling
-//                //    ActivityCompat#requestPermissions
-//                // here to request the missing permissions, and then overriding
-//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                //                                          int[] grantResults)
-//                // to handle the case where the user grants the permission. See the documentation
-//                // for ActivityCompat#requestPermissions for more details.
-//                return;
-//            }
-//            locationManager.requestLocationUpdates(provider, 20000, 0, this); //The first number here is the timespan in milliseconds in which we want want to receive the updates,
-//            // the second one is the distance in meters that the user has to move before we get them.
-//            stopTracking();
         }
     }
 
-    private void startTracking(GoogleMap googleMap) {
-        if (googleMap != null) {
-            routeOpts = new PolylineOptions()
-                    .color(Color.BLUE)
-                    .width(5 /* TODO: respect density! */)
-                    .geodesic(true);
-            route = googleMap.addPolyline(routeOpts);
-            route.setVisible(drawTrack);
-
-            googleMap.setOnMyLocationChangeListener(this);
-        }
-
+    private void intiViews() {
+        tvDistance=(TextView)findViewById(R.id.distanceCovered);
+        tvAvgSpeed=(TextView) findViewById(R.id.avg_speed);
     }
 
-    private void stopTracking(GoogleMap googleMap) {
-        if (googleMap != null)
-            googleMap.setOnMyLocationChangeListener(null);
-
-        if (route != null)
-            route.remove();
-        route = null;
-        routeOpts = null;
-    }
-
+//    @Override
+//    public void onLocationChanged(Location location) {
 //
-
-
-    public void onMyLocationChange(Location location) {
-        if (routeOpts != null) {
-            LatLng myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            List<LatLng> points = route.getPoints();
-            points.add(myLatLng);
-            route.setPoints(points);
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        TextView tvLocation = (TextView) findViewById(R.id.tv_distance_time);
-
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        LatLng latLng = new LatLng(lat, lng);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(lat, lng))
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title("Here"));
-//        // Getting latitude of the current location
-//        double latitude = location.getLatitude();
+//         tvLocation = (TextView) findViewById(R.id.tv_distance_time);
 //
-//        // Getting longitude of the current location
-//        double longitude = location.getLongitude();
-//
-//
-//        // Creating a LatLng object for the current location
-//        LatLng latLng = new LatLng(latitude, longitude);
-//
-//        curLoc = location;
-//        Marker marker;
-//        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-//        marker = googleMap.addMarker(new MarkerOptions().position(loc));
-//        if(googleMap != null){
-//            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
-//        }
-//        Marker marker = googleMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude()))
-//                .title("Hello Maps"));
-//        marker.showInfoWindow();
-        // Showing the current location in Google Map
+//        double lat = location.getLatitude();
+//        double lng = location.getLongitude();
+//        LatLng latLng = new LatLng(lat, lng);
+//        Toast.makeText(LocationActivity.this,location.getLatitude()+" "+location.getLongitude(),Toast.LENGTH_SHORT).show();
+//        startingLocation=location;
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        googleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+//        googleMap.addMarker(new MarkerOptions()
+//                .position(new LatLng(lat, lng))
+//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+//                .title("Here"));
+//        DistanceClass distanceClass=new DistanceClass();
+//        double distance=distanceClass.updateDistance(startingLocation);
 //
-//        // Zoom in the Google Map
-//        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+//        tvLocation.setText("Distance Travelled: " + distance + " metres");
+//    }
 
-        // Setting latitude and longitude in the TextView tv_location
-        tvLocation.setText("Latitude:" + lat + ", Longitude:" + lng);
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // TODO Auto-generated method stub
-    }
 
 
     @Override
@@ -224,40 +136,66 @@ public class LocationActivity extends FragmentActivity implements LocationListen
 
 
         // Enabling MyLocation Layer of Google Map
-            googleMap.setMyLocationEnabled(true);
+        googleMap.setMyLocationEnabled(true);
 
-            // Getting LocationManager object from System Service LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Log.e(" lat_cur",""+lat_curr);
+        Log.e(" lon_curr",""+lon_curr);
 
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
+        Log.e(" lat_new",""+lat_new);
+        Log.e(" lon_new",""+lon_new);
+        Log.e(" distance",""+distanceCovered);
+        Log.e(" speed",""+speed);
 
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
 
-            // Getting Current Location
-            Location location = locationManager.getLastKnownLocation(provider);
+            addPolyLine(googleMap);
+            addMarker(googleMap);
+            showValuesInTextView();
 
-            if (location != null) {
-                onLocationChanged(location);
-                startTracking(googleMap);
-                Toast.makeText(LocationActivity.this,location.getLatitude()+" "+location.getLongitude(),Toast.LENGTH_SHORT).show();
-                System.out.println("Latitude:" + location.getLatitude());
-                System.out.println("Longitude:" + location.getLongitude());
 
-            }
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            locationManager.requestLocationUpdates(provider, 20000, 0, this); //The first number here is the timespan in milliseconds in which we want want to receive the updates,
-//            // the second one is the distance in meters that the user has to move before we get them.
-            stopTracking(googleMap);
+
+    }
+
+
+
+    private void addPolyLine(GoogleMap googleMap) {
+
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+        for (int z = 0; z < arrLocation.size(); z++) {
+            Log.e(" arrayOfLocation",""+arrLocation.get(z));
+            LatLng point = arrLocation.get(z);
+            options.add(point);
+            // move camera to zoom on map
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(arrLocation.get(z)));
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        }
+        line = googleMap.addPolyline(options);
+
+    }
+    private void addMarker(GoogleMap googleMap) {
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(lat_curr, lon_curr))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title("start"));
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(lat_new, lon_new))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                .title("destination"));
+        for (int i=0;i<arrPausedLocation.size();i++)
+        {
+            LatLng point = arrPausedLocation.get(i);
+            googleMap.addMarker(new MarkerOptions()
+                    .position(point)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                    .title("destination"));
+        }
+
+    }
+    private void showValuesInTextView() {
+
+            tvDistance.setText("Distance Covered = " + new DecimalFormat("##.###").format(distanceCovered/1000) + " kms");
+            tvAvgSpeed.setText("Avg Speed = " + new DecimalFormat("##.###").format(speed) + "Km/hr");
+
     }
 }

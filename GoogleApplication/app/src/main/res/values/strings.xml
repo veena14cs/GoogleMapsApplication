@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
-    <string name="google_app_id">732654361262 </string>
+    <string name="app_name">GoogleApplication</string>
     <string name="title_activity_maps">Map</string>
-    <string name="app_name">Location API</string>
-    <string name="lbl_you_are_at">YOU ARE AT</string>
-    <string name="btn_get_location">GET MY LOCATION</string>
-    <string name="btn_start_location_updates">START LOCATION UPDATES</string>
-    <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
 
+    <string name="in_vehicle">In a vehicle</string>
+    <string name="on_bicycle">On a bicycle</string>
+    <string name="on_foot">On foot</string>
+    <string name="running">Running</string>
+    <string name="walking">Walking</string>
+    <string name="still">Still</string>
+    <string name="tilting">Tilting</string>
+    <string name="unknown">Unknown activity</string>
+    <string name="unidentifiable_activity">Unidentifiable activity: %1$d</string>
 
 </resources>
